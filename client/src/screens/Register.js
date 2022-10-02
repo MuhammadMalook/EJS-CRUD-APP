@@ -32,8 +32,21 @@ function Register() {
       confirmPassword: ''
     }}
     validationSchema={validate}
-    onSubmit={values => {
-      console.log(values)
+    onSubmit={async(values) => {
+      const body = {fname:values.firstName, lname: values.lastName, email:values.email, password:values.password }
+      console.log(body)
+      const response = await fetch('/register', {
+        method:"POST",
+        body: JSON.parse(body)
+      })
+      const jsonData = await response.json()
+      if(jsonData)
+      {
+        alert("Registered successfully")
+      }
+      else{
+        alert("error occured")
+      }
     }}
   >
     {formik => (
