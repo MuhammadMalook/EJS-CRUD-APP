@@ -3,35 +3,39 @@ const app = express.Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
+const Admins = require('../shemas/admins')
+const Users = require('../shemas/users')
+
+
 
 app.get('/', (req,res)=>{
     res.status(200).json({msg:"hello"})
 })
 
 const users = []
-const JWT_SECRET = "fddsfdsasgk"
+const JWT_SECRET = process.env.JWT_SECRET
 
 app.post('/register',async(req, res)=>{
-    const {fname,lname, email, password} = req.body
-    const ifExist = users.find(user=> user.email === email)
+    const {fullname, email, password, imageUrl} = req.body
+    const ifExist = await Admins.findOne({email})
+    console.log(ifExist)
     if(ifExist)
-        res.status(401).json({success:false, msg:"User Already Exist"})
+       return res.status(401).json({success:false, msg:"User Already Exist"})
     
+    console.log("hereererere")
     const hashPass = await bcrypt.hash(password, 10)
-    const course = {fname, lname, email,password:hashPass}
-    users.push(course)
-    res.status(200).json({success:true, data:users, msg:"Registered Succesfully"})
+    const admin = await Admins.create({fullname,email,password:hashPass, imageUrl})
+   return  res.status(200).json({success:true, admin, msg:"Registered Succesfully"})
 })
 
 app.post('/login', async(req, res)=>{
     const {email, password} = req.body
     if(!email || !password)
-        res.status(401).json({success:false, msg:"please enter full data"})
-    const user = users.find(user=> user.email === email)
-    if(user)
-    {
-        const index = users.indexOf(user)
-        const checkPass = await bcrypt.compare(password, users[index].password)
+        return res.status(401).json({success:false, msg:"please enter full data"})
+    const admin = await Admins.findOne({email})
+    if(admin)
+    {  
+        const checkPass = await bcrypt.compare(password, admin.password)
         if(checkPass)
         {
             console.log(process.env.JWT_SECRET)
@@ -39,13 +43,13 @@ app.post('/login', async(req, res)=>{
                 algorithm:'HS256',
                 expiresIn:300
             })
-            res.status(200).json({success:true, data:users, token})
+           return res.status(200).json({success:true, data:users, token})
         }
         else
-            res.status(401).json({success:false, msg:"incorrect password"})
+           return res.status(401).json({success:false, msg:"incorrect password"})
     }
     else
-    res.status(401).json({success:false, msg:"incorrect email"})
+      return res.status(401).json({success:false, msg:"incorrect email"})
     
 
 

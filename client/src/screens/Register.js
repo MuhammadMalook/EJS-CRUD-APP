@@ -10,11 +10,8 @@ function Register() {
   const navigate = useNavigate()
 
     const validate = Yup.object({
-        firstName: Yup.string()
-          .max(15, 'Must be 15 characters or less')
-          .required('Required'),
-        lastName: Yup.string()
-          .max(20, 'Must be 20 characters or less')
+        fullname: Yup.string()
+          .max(30, 'Must be 30 characters or less')
           .required('Required'),
         email: Yup.string()
           .email('Email is invalid')
@@ -30,15 +27,14 @@ function Register() {
   return (
     <Formik
     initialValues={{
-      firstName: '',
-      lastName: '',
+      fullname: '',
       email: '',
       password: '',
       confirmPassword: ''
     }}
     validationSchema={validate}
     onSubmit={async(values) => {
-      const body = {fname:values.firstName, lname: values.lastName, email:values.email, password:values.password }
+      const body = {fullname:values.fullname, email:values.email, password:values.password, imageUrl:"" }
       console.log(body)
       const response = await fetch('/register', {
         method:"POST",
@@ -54,7 +50,7 @@ function Register() {
         navigate('/login')
       }
       else{
-        alert("error occured")
+        alert("error occured ", jsonData.msg)
       }
     }}
   >
@@ -70,8 +66,7 @@ function Register() {
             <div>
                 <h1 className="my-4 font-weight-bold .display-4">Sign Up</h1>
                 <Form >
-                  <TextField label="First Name" name="firstName" type="text" />
-                  <TextField label="last Name" name="lastName" type="text" />
+                  <TextField label="Full Name" name="fullname" type="text" />    
                   <TextField label="Email" name="email" type="email" />
                   <TextField label="password" name="password" type="password" />
                   <TextField label="Confirm Password" name="confirmPassword" type="password" />
