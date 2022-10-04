@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Register from './screens/Register'
 import "./App.css"
 
@@ -9,17 +9,23 @@ import {
   Link
 } from "react-router-dom";
 import Login from './screens/Login';
+import Home from './screens/Home';
 
 export default function App() {
-  
   return (
     <>
     <Router>
     
     <Routes>
-          <Route path='/register' element={<Register/>}/>
-          <Route index element={<Register/>}/>
-          <Route path="/login" element={<Login/>}/>
+  
+
+        <Route path = '/home' element={<Home/>}/>
+        <Route index path="/" element={<Login/>}/>
+        <Route path='/register' element={<Register/>}/>
+        <Route  path="/login" element={<Login/>}/>
+        
+
+        
           
         </Routes>
     </Router>

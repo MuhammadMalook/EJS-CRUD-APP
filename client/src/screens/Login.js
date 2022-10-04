@@ -41,9 +41,10 @@ function Login() {
       if(jsonData.success)
       {
         alert("loged in successfully")
-        navigate('/register')
+        
         localStorage.setItem("token", JSON.stringify(jsonData.token))
         console.log(localStorage.getItem("token"))
+        navigate('/home')
       }
       else{
         alert("error occured")

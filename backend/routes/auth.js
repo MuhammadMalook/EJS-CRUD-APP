@@ -41,7 +41,7 @@ app.post('/login', async(req, res)=>{
             console.log(process.env.JWT_SECRET)
             const token =  jwt.sign({email},JWT_SECRET, {
                 algorithm:'HS256',
-                expiresIn:300
+                expiresIn:'10s'
             })
            return res.status(200).json({success:true, data:users, token})
         }
@@ -54,8 +54,9 @@ app.post('/login', async(req, res)=>{
 
 
 })
-app.get('/users', (req, res)=>{
-    const {token} = req.headers
+app.get('/users', async(req, res)=>{
+    const token = req.headers.authorization
+    console.log(token)
     if (!token) {
         return res.status(401).json({success:false, msg:"unauthorized user"})
       }
@@ -65,7 +66,7 @@ var payload
     // Note that we are passing the key in this method as well. This method will throw an error
     // if the token is invalid (if it has expired according to the expiry time we set on sign in),
     // or if the signature does not match
-    payload = jwt.verify(token, JWT_SECRET)
+    payload = jwt.verify(JSON.parse(token), JWT_SECRET)
     console.log(payload)
   } catch (e) {
     if (e instanceof jwt.JsonWebTokenError) {
@@ -75,8 +76,11 @@ var payload
     // otherwise, return a bad request error
     return res.status(400).json({success:false, msg:'wrong token'})
   }
-  res.status(200).json({success:true, msg:`Welcome ${payload.email}!`})
+  console.log("after verify")
+  const user = await Users.find()
+ return res.status(200).json({success:true, user,  msg:`Welcome ${payload.email}!`})
 })
+
 
 module.exports = app
 
