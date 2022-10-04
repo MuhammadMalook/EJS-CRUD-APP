@@ -4,7 +4,8 @@ const Admins = mongoose.Schema({
         type: String
     },
     email: {
-        type: String
+        type: String,
+        unique:[true,"User Already Exists with Email"]
     },
     password:{
         type: String

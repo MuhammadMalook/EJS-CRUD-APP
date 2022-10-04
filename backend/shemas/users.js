@@ -6,11 +6,12 @@ const Users = mongoose.Schema({
     email:{
         type:String
     },
-    Phone: {
+    phone: {
         type: Number,
-        minlength:[11, "Inavid Number"]
+        minlength:[11, "Inavid Number"],
+        unique:[true,"User Already Exists with number"]
     },
-    About: {
+    about: {
         type:String
     },
     imageUrl : {

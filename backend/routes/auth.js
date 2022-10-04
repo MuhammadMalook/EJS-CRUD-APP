@@ -6,13 +6,45 @@ const jwt = require('jsonwebtoken')
 const Admins = require('../shemas/admins')
 const Users = require('../shemas/users')
 
+const upload = require('express-fileupload')
+
+app.use(upload())
+
+
+// const multer = require('multer');
+// // const upload = multer({ dest: 'uploads/' })
+
+// const storage = multer.diskStorage({
+//   destination: function(req, file, cb) {
+//     cb(null, './uploads/');
+//   },
+//   filename: function(req, file, cb) {
+//     cb(null, new Date().toISOString() + file.originalname);
+//   }
+// });
+
+// const fileFilter = (req, file, cb) => {
+//   // reject a file
+//   if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+//     cb(null, true);
+//     console.log('accepted')
+//   } else {
+//     cb(null, false);
+//   }
+// };
+
+
+
+// const upload = multer({
+//   storage: storage
+// });
 
 
 app.get('/', (req,res)=>{
     res.status(200).json({msg:"hello"})
 })
 
-const users = []
+
 const JWT_SECRET = process.env.JWT_SECRET
 
 app.post('/register',async(req, res)=>{
@@ -79,6 +111,43 @@ var payload
   console.log("after verify")
   const user = await Users.find()
  return res.status(200).json({success:true, user,  msg:`Welcome ${payload.email}!`})
+})
+
+app.post("/addUser", async(req, res, next)=>{
+  console.log(req.files, "fileee")
+  if(req.files)
+  {
+    var file = req.files.imageUrl
+    var filename = new Date().getTime()+file.name
+    file.mv('./uploads/'+filename, async function(err){
+        if(err) res.status(400).json(err)
+        else {
+    const newUser = await Users.create({fullname : req.body.fullname, email:req.body.email, phone:req.body.phone, about:req.body.about, imageUrl:filename})
+    console.log(newUser)
+    if(newUser)
+    {
+
+      await Admins.findOneAndUpdate(req.body.admin_email,{$push : {users:newUser._id}} )
+      return res.status(200).json({success:true, newUser })
+    }
+    return res.status(400).json({success:false, msg:"User not added"})
+        }
+    })
+  }
+  ///const imageUrl = req.file.path
+  //const {fullname, email, phone, about, imageUrl} = req.body
+
+
+    // const newUser = await Users.create({fullname, email, phone, about, imageUrl:req.file.path})
+    // console.log(newUser)
+    // if(newUser)
+    // {
+
+    //   Admins.findOneAndUpdate({email},{$push : {users:newUser._id}} )
+    //   return res.status(200).json({success:true, newUser })
+    // }
+    // return res.status(400).json({success:false, msg:"User not added"})
+
 })
 
 
