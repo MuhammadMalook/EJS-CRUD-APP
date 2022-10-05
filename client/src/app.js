@@ -10,23 +10,21 @@ import {
 } from "react-router-dom";
 import Login from './screens/Login';
 import Home from './screens/Home';
+import AddUser from './screens/AddUser';
+
 
 export default function App() {
   return (
     <>
     <Router>
-    
+    {
+      console.log(process.env.REACT_APP_BASE_URL, "url")
+    }
     <Routes>
-  
-
         <Route path = '/home' element={<Home/>}/>
         <Route index path="/" element={<Login/>}/>
-        <Route path='/register' element={<Register/>}/>
-        <Route  path="/login" element={<Login/>}/>
-        
-
-        
-          
+        <Route path='/register' element={<Register/>}/> 
+        <Route path='/adduser' element={<AddUser/>}/> 
         </Routes>
     </Router>
     

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Formik, Form } from 'formik'
 import TextField from './TextField'
 import * as Yup from 'yup';
@@ -8,6 +8,44 @@ import '../assets/Login.css'
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
+  const [api, setApi] = useState(true)
+
+  const checkToken = async() => {
+    console.log("checccccckkllk")
+    setApi(false)
+    var token =  localStorage.getItem('token')
+   if(token){
+    var auth = "Bearer ".concat(JSON.parse(token))
+    const response = await fetch('/users', {
+        method:"GET",
+        headers:{
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            "Authorization": auth,
+        },
+    })
+    const jsonData = await response.json()
+    console.log(jsonData,"jsonDAta")
+    setApi(true)
+    if(jsonData.success)
+    {
+        navigate('/home')
+    }
+    else {
+        localStorage.clear()
+        navigate('/')
+        setToken(null)
+
+    }
+  }
+  else{
+setApi(true)
+  }
+}
+  useEffect(()=>{
+    checkToken()
+  },[])
+
   const navigate  = useNavigate()
 
   const validate = Yup.object({
@@ -38,6 +76,7 @@ function Login() {
         body: JSON.stringify(body)
       })
       const jsonData = await response.json()
+      console.log(jsonData, "datatatatatat")
       if(jsonData.success)
       {
         alert("loged in successfully")
@@ -51,7 +90,7 @@ function Login() {
       }
     }}
   >
-    {formik => (
+    {api ?  formik => (
       <div className="container-login mt-3">
       <div className="row ">
         <div className="col-md-7 my-auto">
@@ -75,7 +114,7 @@ function Login() {
       </div>
     </div>
       
-    )}
+    ) : <p>loading...</p>}
   </Formik>
   )
 }
