@@ -1,17 +1,27 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
+import BounceLoader from 'react-spinners/BounceLoader';
+import ClipLoader from "react-spinners/BounceLoader";
 import '../assets/home.css'
+
 // import image from '../../../backend/uploads/'
 // import image from '../assets/logo.png'
+// const override: CSSProperties = {
+//     display: "block",
+//     margin: "0 auto",
+//     borderColor: "red",
+//   };
 
 export default function Home() {
 
     const baseUrl = process.env.REACT_APP_BASE_URL
     const [users, setUsers] = useState([])
+    const [loading, setLoading] = useState(false)
     const [token,setToken] = useState(localStorage.getItem("token"))
     const navigate = useNavigate()
 
   const checkToken = async() => {
+        setLoading(true)
         
         var auth = "Bearer ".concat(JSON.parse(token))
         const response = await fetch('/users', {
@@ -27,6 +37,8 @@ export default function Home() {
         if(jsonData.success)
         {
             setUsers(jsonData.user)
+            setLoading(false)
+        
         }
         else {
             localStorage.clear()
@@ -45,11 +57,18 @@ export default function Home() {
 
     },[])
   return (
+<> 
+    {
+        loading && <BounceLoader color={"green"} cssOverride={{
+            display: "block",
+            margin: "0 auto",
+            borderColor: "red",
+          }}  size={60} aria-label="Loading Spinner" />
+    }
+ { !loading ? <div className='container'>
+   
 
-
- users ? <div className='container'>
-
-    <table class="table table-hover align-middle">
+     <table class="table table-hover align-middle">
          
         <thead>
                 <tr>
@@ -109,10 +128,10 @@ export default function Home() {
                     navigate('/adduser')
 
         }}/>
-     </div>:
-        <div>loading...</div>
-   
-      
+    
+     </div>: <div></div>
+}
+     </>
     
   )
 }
