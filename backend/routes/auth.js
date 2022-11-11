@@ -64,6 +64,12 @@ app.get('/', (req,res)=>{
     res.status(200).json({msg:"hello"})
 })
 
+app.get('/check', passport.authenticate('adminAuth',{ session: false }), (req,res)=>{
+  console.log("heree")
+  console.log(new Date().toLocaleDateString("en-CA"))
+  return res.status(200).json({success:true, msg:"logged in"})
+
+})
 
 const JWT_SECRET = process.env.JWT_SECRET
 
