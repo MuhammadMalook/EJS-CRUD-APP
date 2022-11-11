@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../assets/home.css'
+import BounceLoader from 'react-spinners/BounceLoader';
+
 // import image from '../../../backend/uploads/'
 // import image from '../assets/logo.png'
 
@@ -9,11 +11,15 @@ export default function Home() {
     const baseUrl = process.env.REACT_APP_BASE_URL
     const [users, setUsers] = useState([])
     const [token,setToken] = useState(localStorage.getItem("token"))
+    const [loading, setLoading] = useState(false)
+
     const navigate = useNavigate()
 
-  const checkToken = async() => {
-        
+    const checkToken = async() => {
+        setLoading(true)
         var auth = "Bearer ".concat(JSON.parse(token))
+        console.log(auth)
+    if(token){
         const response = await fetch('/users', {
             method:"GET",
             headers:{
@@ -22,19 +28,43 @@ export default function Home() {
                 "Authorization": auth,
             },
         })
+        console.log(response)
+      
+        if(response.statusText == "Unauthorized") {
+            console.log("heeereree")
+            localStorage.clear()
+            navigate('/')
+            setToken(null)
+
+        }
+        else{
+           
         const jsonData = await response.json()
-        console.log(jsonData,"jsonDAta")
-        if(jsonData.success)
+        
+        console.log(jsonData.user,"jsonDAta")
+        
+         if(jsonData.success)
         {
-            setUsers(jsonData.user)
+            setTimeout(()=>{
+                setUsers(jsonData.user)
+                setLoading(false)
+            },300)
+           
         }
         else {
+            console.log("heeereree")
             localStorage.clear()
             navigate('/')
             setToken(null)
 
         }
     }
+}
+    else{
+   
+    navigate('/')
+    }
+}
 
     useEffect(()=>{
        
@@ -45,11 +75,18 @@ export default function Home() {
 
     },[])
   return (
-
-
- users ? <div className='container'>
-
-    <table class="table table-hover align-middle">
+    <>
+    {
+        //style="background-color: #ebebeb; box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset; margin: 5%; border-radius: 20px;"
+        loading && <BounceLoader color={"green"} cssOverride={{
+            display: "block",
+            margin: "0 auto",
+            borderColor: "red",
+          }}  size={60} aria-label="Loading Spinner" />
+    }
+{
+!loading && users.length > 0 ? <div className='container' style={{backgroundColor:"#ebebeb", boxShadow:" box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset",margin:"5%", borderRadius:"20px" }}>
+    <table class="table table-hover align-middle" >
          
         <thead>
                 <tr>
@@ -109,10 +146,11 @@ export default function Home() {
                     navigate('/adduser')
 
         }}/>
-     </div>:
-        <div>loading...</div>
+     </div> :
+        !loading ? <div style={{display:'flex', justifyContent:'center'}}>No data available</div>: <div></div>
+    }
    
-      
+        </>
     
   )
 }

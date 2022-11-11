@@ -10,38 +10,58 @@ import { useNavigate } from 'react-router-dom';
 function Login() {
   const [api, setApi] = useState(true)
 
+
+
   const checkToken = async() => {
-    console.log("checccccckkllk")
+    
     setApi(false)
     var token =  localStorage.getItem('token')
+    
    if(token){
+ 
     var auth = "Bearer ".concat(JSON.parse(token))
-    const response = await fetch('/users', {
+   
+
+    const response = await fetch('/check', {
         method:"GET",
         headers:{
-            Accept: 'application/json',
+             Accept: 'application/json',
             'Content-Type': 'application/json',
             "Authorization": auth,
         },
     })
+  
+   if(response.statusText == "Unauthorized")
+   {
+            
+            localStorage.clear()
+            navigate('/')
+            setApi(false)
+            store.dispatch(logout(""))
+         
+   }
+   else{
     const jsonData = await response.json()
-    console.log(jsonData,"jsonDAta")
-    setApi(true)
+
+    setApi(false)
     if(jsonData.success)
     {
+      
         navigate('/home')
     }
     else {
         localStorage.clear()
         navigate('/')
-        setToken(null)
+       
 
     }
   }
+}
   else{
-setApi(true)
+  setApi(true)
   }
 }
+
   useEffect(()=>{
     checkToken()
   },[])
