@@ -1,17 +1,25 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
+import BounceLoader from 'react-spinners/BounceLoader';
+import ClipLoader from "react-spinners/BounceLoader";
 import '../assets/home.css'
 import BounceLoader from 'react-spinners/BounceLoader';
 
 // import image from '../../../backend/uploads/'
 // import image from '../assets/logo.png'
+// const override: CSSProperties = {
+//     display: "block",
+//     margin: "0 auto",
+//     borderColor: "red",
+//   };
 
 export default function Home() {
 
     const baseUrl = process.env.REACT_APP_BASE_URL
     const [users, setUsers] = useState([])
-    const [token,setToken] = useState(localStorage.getItem("token"))
     const [loading, setLoading] = useState(false)
+    const [token,setToken] = useState(localStorage.getItem("token"))
+    //const [loading, setLoading] = useState(false)
 
     const navigate = useNavigate()
 
